@@ -179,8 +179,32 @@ class Develop(develop):
         super().run()
 
 
-with open("requirements.txt") as requirements_file:
-    install_requires = list(map(str, parse_requirements(requirements_file)))
+#with open("requirements.txt") as requirements_file:
+#    install_requires = list(map(str, parse_requirements(requirements_file)))
+install_requires = [
+    'PyYAML',
+    'torch>=1.9.0',
+    'numpy>=1.17',
+    'scipy>=1.2.1',
+    'prefetch_generator>=1.0.1',
+    'msgpack>=0.5.6',
+    'sortedcontainers',
+    'uvloop>=0.14.0; sys_platform != "win32"',
+    'grpcio-tools>=1.33.2',
+    'protobuf>=3.12.2',
+    'configargparse>=1.2.3',
+    'py-multihash>=0.2.3',
+    'multiaddr@ git+https://github.com/multiformats/py-multiaddr.git@e01dbd38f2c0464c0f78b556691d655265018cce',
+    'cryptography>=3.4.6',
+    'pydantic<2.0,>=1.8.1',
+    'packaging>=20.9',
+    'pywin32; sys_platform == "win32"',
+    'pathos; sys_platform == "win32"',
+    'psutil',
+]
+
+#for req in install_requires:
+#    print(req)
 
 # loading version from setup.py
 with codecs.open(os.path.join(here, "hivemind/__init__.py"), encoding="utf-8") as init_file:
@@ -189,11 +213,30 @@ with codecs.open(os.path.join(here, "hivemind/__init__.py"), encoding="utf-8") a
 
 extras = {}
 
-with open("requirements-dev.txt") as dev_requirements_file:
-    extras["dev"] = list(map(str, parse_requirements(dev_requirements_file)))
+#with open("requirements-dev.txt") as dev_requirements_file:
+#    extras["dev"] = list(map(str, parse_requirements(dev_requirements_file)))
+extras["dev"] = [
+    'pytest==6.2.5;  sys_platform != "win32"', # see https://github.com/pytest-dev/pytest/issues/9621
+    'pytest; sys_platform == "win32"',
+    'pytest-forked; sys_platform == "linux" or sys_platform == "darwin"',
+    'pytest-asyncio==0.16.0',
+    'pytest-cov',
+    'coverage==6.0.2',  # see https://github.com/pytest-dev/pytest-cov/issues/520
+    'tqdm',
+    'scikit-learn',
+    'black==22.3.0',
+    'isort==5.10.1',
+    'codespell==2.2.2',
+]
 
-with open("requirements-docs.txt") as docs_requirements_file:
-    extras["docs"] = list(map(str, parse_requirements(docs_requirements_file)))
+#with open("requirements-docs.txt") as docs_requirements_file:
+#    extras["docs"] = list(map(str, parse_requirements(docs_requirements_file)))
+extras["docs"] = [
+    'recommonmark==0.5.0',
+    'sphinx_rtd_theme==0.4.3',
+    'docutils==0.16',
+    'sphinx==4.2.0',
+]
 
 extras["bitsandbytes"] = ["bitsandbytes~=0.41.1"]
 
