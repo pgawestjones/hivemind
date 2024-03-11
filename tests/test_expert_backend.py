@@ -39,7 +39,7 @@ def example_experts():
     yield experts
 
 
-@pytest.mark.forked
+
 def test_save_load_checkpoints(example_experts):
     expert = example_experts[EXPERT_NAME].module
 
@@ -62,7 +62,7 @@ def test_save_load_checkpoints(example_experts):
         assert expert.weight.data[0] == EXPERT_WEIGHT_UPDATES
 
 
-@pytest.mark.forked
+
 def test_restore_update_count(example_experts):
     expert_backend = example_experts[EXPERT_NAME]
 
@@ -84,7 +84,7 @@ def test_restore_update_count(example_experts):
         assert expert_backend.scheduler._step_count == BACKWARD_PASSES_BEFORE_SAVE + 1
 
 
-@pytest.mark.forked
+
 def test_lr_schedule(example_experts):
     expert_backend = example_experts[EXPERT_NAME]
     optimizer = expert_backend.optimizer

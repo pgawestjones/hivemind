@@ -17,7 +17,7 @@ import torch
 
 from hivemind.dht import DHT
 from hivemind.moe.expert_uid import UID_DELIMITER
-from hivemind.moe.server.checkpoints import CheckpointSaver, is_directory, load_experts
+from hivemind.moe.server.checkpoints import CheckpointSaver, load_experts
 from hivemind.moe.server.connection_handler import ConnectionHandler
 from hivemind.moe.server.dht_handler import DHTHandlerThread, get_experts
 from hivemind.moe.server.layers import (
@@ -164,10 +164,15 @@ class Server(threading.Thread):
 
         if expert_uids is None:
             if checkpoint_dir is not None:
-                assert is_directory(checkpoint_dir)
-                expert_uids = [
-                    child.name for child in checkpoint_dir.iterdir() if (child / "checkpoint_last.pt").exists()
-                ]
+                checkpoint_dir.exists() and checkpoint_dir.is_dir()
+                if sys.platform == "win32":
+                    expert_uids = [
+                        child.name for child in checkpoint_dir.iterdir() if (child / "checkpoint_last.lnk").exists()
+                    ]
+                else:
+                    expert_uids = [
+                        child.name for child in checkpoint_dir.iterdir() if (child / "checkpoint_last.pt").exists()
+                    ]
                 total_experts_in_checkpoint = len(expert_uids)
                 logger.info(f"Located {total_experts_in_checkpoint} checkpoints for experts {expert_uids}")
 
@@ -345,7 +350,8 @@ def _server_runner(pipe, *args, **kwargs):
         dht_maddrs = server.dht.get_visible_maddrs()
         pipe.send((True, PeerInfo(server.dht.peer_id, dht_maddrs)))
         pipe.recv()  # wait for shutdown signal
-
+    except Exception as e:
+        logger.exception(f"Server failed: {e}")
     finally:
         logger.info("Shutting down server...")
         server.shutdown()

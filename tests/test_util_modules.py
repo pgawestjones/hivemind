@@ -48,6 +48,7 @@ def test_mpfuture_result():
     p = mp.Process(target=_proc, args=(future,))
     p.start()
     p.join()
+    p.close()
 
     assert future.result() == 321
     assert future.exception() is None
@@ -74,6 +75,7 @@ def test_mpfuture_exception():
     p = mp.Process(target=_proc, args=(future,))
     p.start()
     p.join()
+    p.close()
 
     assert isinstance(future.exception(), NotImplementedError)
     with pytest.raises(NotImplementedError):
@@ -104,6 +106,7 @@ def test_mpfuture_cancel():
     p = mp.Process(target=_proc)
     p.start()
     p.join()
+    p.close()
     assert evt.is_set()
 
 
@@ -119,6 +122,7 @@ def test_mpfuture_status():
     p = mp.Process(target=_proc1, args=(future,))
     p.start()
     p.join()
+    p.close()
     assert evt.is_set()
     evt.clear()
 
@@ -137,6 +141,7 @@ def test_mpfuture_status():
     p = mp.Process(target=_proc2, args=(future,))
     p.start()
     p.join()
+    p.close()
     evt.set()
 
     future2 = hivemind.MPFuture()
@@ -177,6 +182,7 @@ async def test_await_mpfuture():
     assert (await asyncio.gather(f1, f2)) == ["abc", "def"]
     for p in p1, p2:
         p.join()
+        p.close()
 
     # await cancel
     f1, f2 = hivemind.MPFuture(), hivemind.MPFuture()
@@ -195,6 +201,7 @@ async def test_await_mpfuture():
         await asyncio.gather(f1, f2)
 
     p.join()
+    p.close()
 
     # await exception
     f1, f2 = hivemind.MPFuture(), hivemind.MPFuture()
@@ -213,6 +220,7 @@ async def test_await_mpfuture():
         await asyncio.gather(f1, f2)
 
     p.join()
+    p.close()
 
 
 
@@ -235,6 +243,7 @@ def test_mpfuture_bidirectional():
     out[1].set_result(["we", "need", "to", "go", "deeper"])
 
     p.join()
+    p.close()
     assert evt.is_set()
 
 
@@ -283,7 +292,7 @@ def test_mpfuture_done_callback():
 
     events[5].set()
     p.join()
-
+    p.close()
 
 
 def test_many_futures():
@@ -327,12 +336,14 @@ def test_many_futures():
     for future in random.sample(some_fork_futures, 200):
         future.set_result(321)
 
+    time.sleep(0.1)
     evt.set()
     for future in main_futures:
         future.cancel()
     time.sleep(0.1)  # giving enough time for the futures to be destroyed
     assert len(hivemind.MPFuture._active_futures) == 0
     p.join()
+    p.close()
 
 
 def test_serialize_tuple():
@@ -578,5 +589,7 @@ def test_performance_ema_threadsafe(
         total_size = sum(future.result() for future in futures)
         end_time = time.perf_counter()
         target = total_size / (end_time - start_time)
-        assert ema.samples_per_second >= (1 - tolerance) * target * max_workers ** (bias_power - 1)
-        assert ema.samples_per_second <= (1 + tolerance) * target
+        min_samples_per_second = (1 - tolerance) * target * max_workers ** (bias_power - 1)
+        max_samples_per_second = (1 + tolerance) * target
+        assert ema.samples_per_second >= min_samples_per_second
+        assert ema.samples_per_second <= max_samples_per_second
