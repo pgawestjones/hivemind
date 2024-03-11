@@ -8,7 +8,6 @@ if sys.platform == 'win32':
 else:
     import multiprocessing as mp
 import os
-import signal
 from functools import partial
 from typing import Awaitable, Callable, Iterable, List, Optional, Sequence, TypeVar, Union
 
@@ -20,10 +19,6 @@ from hivemind.dht.validation import CompositeValidator, RecordValidatorBase
 from hivemind.p2p import P2P, PeerID
 from hivemind.utils import MPFuture, get_logger, switch_to_uvloop
 from hivemind.utils.timed_storage import DHTExpiration, ValueWithExpiration
-
-if sys.platform == 'win32':
-    import pywintypes
-    from multiprocess.connection import Client, Listener, PipeConnection
 
 logger = get_logger(__name__)
 ReturnType = TypeVar("ReturnType")
