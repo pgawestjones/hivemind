@@ -28,7 +28,6 @@ async def dht_nodes_with_schema():
     await asyncio.gather(alice.shutdown(), bob.shutdown())
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_expecting_regular_value(dht_nodes_with_schema):
     alice, bob = dht_nodes_with_schema
@@ -46,7 +45,6 @@ async def test_expecting_regular_value(dht_nodes_with_schema):
         assert (await peer.get("experiment_name", latest=True)).value == b"foo_bar"
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_expecting_dictionary(dht_nodes_with_schema):
     alice, bob = dht_nodes_with_schema
@@ -76,7 +74,6 @@ async def test_expecting_dictionary(dht_nodes_with_schema):
         assert len(dictionary) == 2 and dictionary[b"uid1"].value == 777 and dictionary[b"uid2"].value == 778
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_expecting_public_keys(dht_nodes_with_schema):
     alice, bob = dht_nodes_with_schema
@@ -91,7 +88,6 @@ async def test_expecting_public_keys(dht_nodes_with_schema):
         assert len(dictionary) == 1 and dictionary[b"uid[owner:public-key]"].value == b"foo_bar"
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_keys_outside_schema(dht_nodes_with_schema):
     class Schema(BaseModel):
@@ -118,7 +114,6 @@ async def test_keys_outside_schema(dht_nodes_with_schema):
                 assert result is None
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_prefix():
     class Schema(BaseModel):
@@ -140,7 +135,6 @@ async def test_prefix():
     await asyncio.gather(alice.shutdown(), bob.shutdown())
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_merging_schema_validators(dht_nodes_with_schema):
     alice, bob = dht_nodes_with_schema
@@ -182,7 +176,6 @@ async def test_merging_schema_validators(dht_nodes_with_schema):
         assert (await peer.get("unknown_key", latest=True)).value == 999
 
 
-@pytest.mark.forked
 def test_sending_validator_instance_between_processes():
     alice = hivemind.DHT(start=True)
     bob = hivemind.DHT(start=True, initial_peers=alice.get_visible_maddrs())

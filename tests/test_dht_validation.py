@@ -65,7 +65,6 @@ def test_composite_validator(validators_for_app):
     assert not validator.validate(signed_record)
 
 
-@pytest.mark.forked
 def test_dht_add_validators(validators_for_app):
     # One app may create a DHT with its validators
     dht = hivemind.DHT(start=False, record_validators=validators_for_app["A"])
