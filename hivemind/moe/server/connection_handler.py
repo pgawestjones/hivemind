@@ -1,10 +1,8 @@
 import asyncio
 import sys
+import multiprocessing as mp
 if sys.platform == 'win32':
-    import pathos
     import multiprocess as mp
-else:
-    import multiprocessing as mp
 from typing import AsyncIterator, Dict, Iterable, List, Optional, Tuple, Union
 
 import torch

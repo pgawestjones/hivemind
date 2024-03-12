@@ -6,11 +6,9 @@ import asyncio
 import contextlib
 import ctypes
 import sys
+import multiprocessing as mp
 if sys.platform == 'win32':
-    import pathos
     import multiprocess as mp
-else:
-    import multiprocessing as mp
 import os
 import random
 import signal

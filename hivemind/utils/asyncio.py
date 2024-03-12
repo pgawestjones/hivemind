@@ -1,11 +1,9 @@
 import asyncio
 import concurrent.futures
 import sys
+import multiprocessing as mp
 if sys.platform == 'win32':
-    import pathos
     import multiprocess as mp
-else:
-    import multiprocessing as mp
 import os
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import AbstractAsyncContextManager, AbstractContextManager, asynccontextmanager

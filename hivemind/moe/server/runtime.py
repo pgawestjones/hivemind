@@ -1,10 +1,7 @@
 import sys
+import multiprocessing as mp
 if sys.platform == 'win32':
-    import pathos
     import multiprocess as mp
-else:
-    import multiprocessing as mp
-import multiprocessing.pool
 import threading
 from collections import defaultdict
 from itertools import chain

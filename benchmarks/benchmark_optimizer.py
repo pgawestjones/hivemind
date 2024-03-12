@@ -1,9 +1,8 @@
 import sys
+import multiprocessing as mp
 if sys.platform == 'win32':
-    import pathos
     import multiprocess as mp
-else:
-    import multiprocessing as mp
+
 import random
 import time
 from contextlib import nullcontext

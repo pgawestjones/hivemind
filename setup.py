@@ -199,7 +199,7 @@ install_requires = [
     'pydantic<2.0,>=1.8.1',
     'packaging>=20.9',
     'pywin32; sys_platform == "win32"',
-    'pathos; sys_platform == "win32"',
+    'multiprocess; sys_platform == "win32"',
     'psutil',
 ]
 
