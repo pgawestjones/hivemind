@@ -1,23 +1,20 @@
 from __future__ import annotations
 import sys
-
-import asyncio
-import concurrent.futures._base as base
 import multiprocessing as mp
-if sys.platform == 'win32':
-    import multiprocess as mp
-
+import asyncio
 import os
 import threading
 import uuid
 from contextlib import nullcontext
 from enum import Enum, auto
-from multiprocessing.reduction import ForkingPickler
+#from multiprocessing.reduction import ForkingPickler
 from typing import Any, Callable, Dict, Generic, Optional, TypeVar
 from weakref import ref
 
 
 import torch  # used for py3.7-compatible shared memory
+
+import concurrent.futures._base as base
 
 from hivemind.utils.logging import get_logger
 
@@ -41,6 +38,11 @@ except ImportError:
     class InvalidStateError(Exception):
         """Raised when attempting to change state of a future in a terminal state (e.g. finished)"""
 
+if sys.platform == 'win32':
+    import multiprocess as mp
+    from multiprocess.reduction import ForkingPickler
+else:
+    from multiprocessing.reduction import ForkingPickler
 
 class SharedBytes:
     """
