@@ -115,7 +115,6 @@ def test_signing_in_different_process():
     assert validator.validate(signed_record)
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_dhtnode_signatures():
     alice = await DHTNode.create(record_validator=RSASignatureValidator())
