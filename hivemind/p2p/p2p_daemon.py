@@ -9,7 +9,7 @@ from collections.abc import AsyncIterable as AsyncIterableABC
 from contextlib import closing, suppress
 from dataclasses import dataclass
 from datetime import datetime
-from importlib.resources import path
+from importlib.resources import files, as_file
 from typing import Any, AsyncIterator, Awaitable, Callable, List, Optional, Sequence, Tuple, Type, TypeVar, Union
 
 from google.protobuf.message import Message
@@ -161,7 +161,9 @@ class P2P:
             )
 
         self = cls()
-        with path(cli, P2PD_FILENAME) as p:
+        #with path(cli, P2PD_FILENAME) as p:
+        #    p2pd_path = p
+        with as_file(files(cli) / P2PD_FILENAME) as p:
             p2pd_path = p
 
         socket_uid = secrets.token_urlsafe(8)
