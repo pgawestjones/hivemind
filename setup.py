@@ -194,7 +194,7 @@ install_requires = [
     'protobuf>=3.12.2',
     'configargparse>=1.2.3',
     'py-multihash>=0.2.3',
-    'multiaddr@ git+https://github.com/multiformats/py-multiaddr.git@e01dbd38f2c0464c0f78b556691d655265018cce',
+    'multiaddr @ git+https://github.com/learning-at-home/py-multiaddr.git@e01dbd38f2c0464c0f78b556691d655265018cce',
     'cryptography>=3.4.6',
     'pydantic<2.0,>=1.8.1',
     'packaging>=20.9',
