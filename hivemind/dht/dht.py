@@ -126,7 +126,7 @@ class DHT(mp.Process):
                 async def non_blocking_poll(pipe, callback):
                     import concurrent
                     with concurrent.futures.ThreadPoolExecutor() as pool:
-                        await loop.run_in_executor(pool, pipe.poll)
+                        await loop.run_in_executor(pool, pipe.poll, 20)
                     callback()
 
             while True:

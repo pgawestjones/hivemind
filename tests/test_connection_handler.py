@@ -35,8 +35,6 @@ async def client_stub():
     handler.shutdown()
     handler_dht.shutdown()
 
-
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_connection_handler_info(client_stub):
     response = await client_stub.rpc_info(runtime_pb2.ExpertUID(uid="expert1"))
@@ -49,7 +47,6 @@ async def test_connection_handler_info(client_stub):
         await client_stub.rpc_info(runtime_pb2.ExpertUID(uid="expert999"))
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_connection_handler_forward(client_stub):
     inputs = torch.randn(1, 2)
@@ -100,8 +97,6 @@ async def test_connection_handler_forward(client_stub):
             runtime_pb2.ExpertRequest(uid="expert1", tensors=[serialize_torch_tensor(torch.arange(5))])
         )
 
-
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_connection_handler_backward(client_stub):
     inputs = torch.randn(1, 2)
@@ -154,7 +149,6 @@ async def test_connection_handler_backward(client_stub):
     await client_stub.rpc_forward(runtime_pb2.ExpertRequest(uid="expert1", tensors=[serialize_torch_tensor(inputs)]))
 
 
-@pytest.mark.forked
 @pytest.mark.asyncio
 async def test_connection_handler_shutdown():
     # Here, all handlers will have the common hivemind.DHT and hivemind.P2P instances

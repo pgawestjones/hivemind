@@ -1,11 +1,11 @@
 import asyncio
 import sys
 import multiprocessing as mp
-if sys.platform == 'win32':
-    import multiprocess as mp
+
 from typing import AsyncIterator, Dict, Iterable, List, Optional, Tuple, Union
 
 import torch
+
 
 from hivemind.compression import deserialize_tensor_stream, deserialize_torch_tensor, serialize_torch_tensor
 from hivemind.dht import DHT
@@ -18,6 +18,14 @@ from hivemind.utils import MPFuture, MSGPackSerializer, as_aiter, get_logger, ne
 from hivemind.utils.asyncio import amap_in_executor, switch_to_uvloop
 from hivemind.utils.streaming import split_for_streaming
 from hivemind.utils.tensor_descr import BatchTensorDescriptor
+
+
+if sys.platform == 'win32':
+    import multiprocess as mp
+    import dill
+    import torch.multiprocessing.reductions as reductions
+    reductions.ForkingPickler = dill.Pickler
+    reductions.ForkingPickler.dumps = dill.dumps
 
 logger = get_logger(__name__)
 
@@ -56,27 +64,37 @@ class ConnectionHandler(mp.Process, ServicerBase):
         loop = switch_to_uvloop()
         stop = asyncio.Event()
         if sys.platform != "win32":
-            loop.add_reader(self._inner_pipe.fileno(), stop.set)
-        else:
-            async def non_blocking_poll(pipe, callback):
-                import concurrent
-                with concurrent.futures.ThreadPoolExecutor() as pool:
-                    await loop.run_in_executor(pool, pipe.poll)
-                print("non_blocking_poll--about to callback")
-                callback()
+            loop.add_reader(self._inner_pipe.fileno(), stop.set)            
 
         async def _run():
+                
             try:
-                if sys.platform == 'win32':
-                    await non_blocking_poll(self._inner_pipe, stop.set)
-                    
                 self._p2p = await self.dht.replicate_p2p()
                 await self.add_p2p_handlers(self._p2p, balanced=self.balanced)
-                self.ready.set_result(None)
+                self.ready.set_result(None)              
             except Exception as e:
                 logger.error("ConnectionHandler failed to start:", exc_info=True)
                 self.ready.set_exception(e)
 
+            if sys.platform == "win32":
+                if sys.platform == 'win32':
+                    async def non_blocking_poll(pipe, callback):
+                        import concurrent
+                        with concurrent.futures.ThreadPoolExecutor() as pool:
+                            await loop.run_in_executor(pool, pipe.recv)
+                        callback()
+                
+                
+                await non_blocking_poll(self._inner_pipe, stop.set)
+                #import queue
+                #while True:
+                #    try:
+                #        if self._shutdown_queue.get_nowait() == '_shutdown':
+                #            break
+                #    except queue.Empty as e:
+                #        await asyncio.sleep(0.1)                
+                #await self.remove_p2p_handlers(self._p2p)
+           
             try:
                 await stop.wait()
             finally:
